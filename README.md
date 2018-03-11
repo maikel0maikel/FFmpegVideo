@@ -1,0 +1,2 @@
+# FFmpegVideo
+从摄像头采集视频流后用ffmpeg进行编码推送到服务器
