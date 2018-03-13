@@ -8,6 +8,7 @@ import com.ffmpeg.maikel.video.presenter.CameraPresenter;
 import com.ffmpeg.maikel.video.ui.presenter.MainViewPresenter;
 import com.ffmpeg.maikel.video.utils.ScreenUtils;
 
+
 /**
  * Created by maikel on 2018/3/12.
  */
@@ -20,6 +21,7 @@ public class CameraPresenterImpl implements CameraPresenter {
     private Camera mCamera = null;
 
     private MainViewPresenter mView;
+
 
     public CameraPresenterImpl(MainViewPresenter view) {
         mView = view;
@@ -41,6 +43,7 @@ public class CameraPresenterImpl implements CameraPresenter {
             mView.cameraError();
         }
     }
+
 
     @Override
     public void rotation(int orientation) {
