@@ -16,4 +16,6 @@ public interface CameraPresenter extends BasePresenter{
 
     void destroy();
 
+    void finishMain();
+
 }
