@@ -2,12 +2,13 @@ package com.ffmpeg.maikel.video.ui;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
 import android.view.Window;
 
 import com.ffmpeg.maikel.video.R;
@@ -55,16 +56,9 @@ public class MainActivity extends Activity implements MainViewPresenter {
         }
     }
 
-
     @Override
     public void cameraOpened(Camera camera) {
         //set Camera icon enable
-        Window window = getWindow();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        window.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int screenW = displayMetrics.widthPixels;
-        int screenH = displayMetrics.heightPixels;
-        mCameraView.initSurface(camera,screenW,screenW,cameraPresenter);
     }
 
     @Override
@@ -83,9 +77,23 @@ public class MainActivity extends Activity implements MainViewPresenter {
     }
 
     @Override
+    public CameraView getCameraView() {
+        return mCameraView;
+    }
+
+    @Override
+    public Context getViewContext() {
+        return this;
+    }
+
+    @Override
+    public void destroy() {
+        finish();
+    }
+
+    @Override
     public void setPresenter(BasePresenter presenter) {
         cameraPresenter = (CameraPresenter) presenter;
-        setVideoRotation();
     }
     
     @Override
@@ -97,6 +105,14 @@ public class MainActivity extends Activity implements MainViewPresenter {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         if (cameraPresenter != null) {
             cameraPresenter.rotation(rotation);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (cameraPresenter!=null){
+            cameraPresenter.destroy();
         }
     }
 }
