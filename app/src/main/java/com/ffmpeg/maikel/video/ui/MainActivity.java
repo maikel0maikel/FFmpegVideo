@@ -9,6 +9,7 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.view.Window;
 
 import com.ffmpeg.maikel.video.R;
@@ -26,6 +27,7 @@ public class MainActivity extends Activity implements MainViewPresenter {
     private static final int PERMISSION_REQUEST_CODE = 10;
     private CameraPresenter cameraPresenter;
     private CameraView mCameraView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -42,6 +44,15 @@ public class MainActivity extends Activity implements MainViewPresenter {
         setContentView(R.layout.activity_main);
         mCameraView = findViewById(R.id.video_surface_view);
         new CameraPresenterImpl(this).start();
+    }
+
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.switchCamera:
+                view.setEnabled(false);
+                cameraPresenter.switchCamera();
+                break;
+        }
     }
 
     @Override
@@ -72,8 +83,8 @@ public class MainActivity extends Activity implements MainViewPresenter {
     }
 
     @Override
-    public void switchCamera() {
-        cameraPresenter.switchCamera();
+    public void cameraSate(boolean flag) {
+        findViewById(R.id.switchCamera).setEnabled(flag);
     }
 
     @Override
@@ -95,13 +106,14 @@ public class MainActivity extends Activity implements MainViewPresenter {
     public void setPresenter(BasePresenter presenter) {
         cameraPresenter = (CameraPresenter) presenter;
     }
-    
+
     @Override
-    public void onConfigurationChanged(Configuration newConfig){
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setVideoRotation();
     }
-    private void setVideoRotation(){
+
+    private void setVideoRotation() {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         if (cameraPresenter != null) {
             cameraPresenter.rotation(rotation);
@@ -111,7 +123,7 @@ public class MainActivity extends Activity implements MainViewPresenter {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (cameraPresenter!=null){
+        if (cameraPresenter != null) {
             cameraPresenter.destroy();
         }
     }

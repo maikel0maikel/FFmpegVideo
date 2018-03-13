@@ -17,7 +17,9 @@ public interface MainViewPresenter extends BaseView{
 
     void displayError();
 
-    void switchCamera();
+    void cameraSate(boolean flag);
+
+
 
     CameraView getCameraView();
 
