@@ -85,5 +85,18 @@ public class MainActivity extends Activity implements MainViewPresenter {
     @Override
     public void setPresenter(BasePresenter presenter) {
         cameraPresenter = (CameraPresenter) presenter;
+        setVideoRotation();
+    }
+    
+    @Override
+    public void onConfigurationChanged(Configuration newConfig){
+        super.onConfigurationChanged(newConfig);
+        setVideoRotation();
+    }
+    private void setVideoRotation(){
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        if (cameraPresenter != null) {
+            cameraPresenter.rotation(rotation);
+        }
     }
 }
