@@ -1,6 +1,9 @@
 package com.ffmpeg.maikel.video.ui.presenter;
 
+import android.content.Context;
 import android.hardware.Camera;
+
+import com.ffmpeg.maikel.video.widget.CameraView;
 
 /**
  * Created by maikel on 2018/3/12.
@@ -16,5 +19,10 @@ public interface MainViewPresenter extends BaseView{
 
     void switchCamera();
 
+    CameraView getCameraView();
 
+    Context getViewContext();
+
+    void destroy();
 }
+
