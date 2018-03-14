@@ -7,7 +7,6 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.View;
 
 import com.ffmpeg.maikel.video.bean.SurpportedSize;
 import com.ffmpeg.maikel.video.presenter.CameraPresenter;
@@ -19,8 +18,6 @@ import com.ffmpeg.maikel.video.video.VideoFrameCallback;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
@@ -71,16 +68,16 @@ public class CameraPresenterImpl implements CameraPresenter {
         mView.setPresenter(this);
         defaultWidth = ScreenUtils.getScreenDensity(mView.getViewContext()).widthPixels;
         defaultHeight = ScreenUtils.getScreenDensity(mView.getViewContext()).heightPixels;
+        if (videoFrameCallback == null) {
+            videoFrameCallback = VideoFrameCallback.getInstance();
+            new Thread(videoFrameCallback).start();
+        }
     }
 
     private void initCamera() {
         try {
             mCamera = Camera.open(mCameraId);
-            if (videoFrameCallback == null){
-                videoFrameCallback = new VideoFrameCallback();
-            }
             mCamera.setPreviewCallback(videoFrameCallback);
-            //new Thread(videoFrameCallback).start();
             mCamera.setDisplayOrientation(90);
             mView.cameraOpened(mCamera);
             mView.getCameraView().initSurface(this);
@@ -93,8 +90,8 @@ public class CameraPresenterImpl implements CameraPresenter {
 
     @Override
     public void rotation(int orientation) {
-        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-        android.hardware.Camera.getCameraInfo(mCameraId, info);
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(mCameraId, info);
         int degrees = 0;
         switch (orientation) {
             case Surface.ROTATION_0:
@@ -124,13 +121,14 @@ public class CameraPresenterImpl implements CameraPresenter {
 
     @Override
     public void switchCamera() {
-        if (mCameraId==FRONT_CAMERA){
+        if (mCameraId == FRONT_CAMERA) {
             mCameraId = BACK_CAMERA;
-        }else {
+        } else {
             mCameraId = FRONT_CAMERA;
         }
         stopPreview();
-        if (mCamera!=null){
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
             mCamera.release();
             mCamera = null;
         }
@@ -269,7 +267,7 @@ public class CameraPresenterImpl implements CameraPresenter {
             mCamera.startPreview();
             isPreview = true;
             mView.cameraSate(isPreview);
-            //videoFrameCallback.videoStart(isPreview);
+            videoFrameCallback.videoStart(isPreview);
         } catch (IOException e) {
             Log.e(TAG, "<startPreview> camera can not preview!" + e.getMessage());
             finishMain();
@@ -357,7 +355,7 @@ public class CameraPresenterImpl implements CameraPresenter {
 		 */
         initializeAddCallbackBufferMethod();
         /*
-		 * Add three buffers to the buffer queue. I re-queue them once they are
+         * Add three buffers to the buffer queue. I re-queue them once they are
 		 * used in onPreviewFrame, so we should not need many of them.
 		 */
         byte[] buffer = new byte[bufSize];
@@ -440,7 +438,7 @@ public class CameraPresenterImpl implements CameraPresenter {
             Class c = Class.forName("android.hardware.Camera");
 
             Method spcwb = null;
-			/*
+            /*
 			 * This way of finding our method is a bit inefficient, but I am a
 			 * reflection novice, and didn't want to waste the time figuring out
 			 * the right way to do it. since this method is only called once,
@@ -544,6 +542,7 @@ public class CameraPresenterImpl implements CameraPresenter {
         }
         if (videoFrameCallback != null) {
             videoFrameCallback.videoStart(false);
+//            videoFrameCallback = null;
         }
     }
 
