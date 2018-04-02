@@ -20,6 +20,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.FloatActivity" android:theme="@style/Theme.transparent" 
+                  android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>
